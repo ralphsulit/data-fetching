@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import Home from './Home';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 function DataFetching() {
   const [email, setEmail] = useState(''); //Email
   const [password, setPassword] = useState(''); // Password
-  const [error, setError] = useState(''); //Error
-  const [sendMessage, setSendMessage] = useState(''); //Send Message
-  // const [headers, setHeaders] = useState({
-  //   'access-token': '',
-  //   'client': '',
-  //   'expiry': 0,
-  //   'uid': ''
-  // });
+  const [sendMessage, setSendMessage] = useState(''); //Send 
 
   //Register Button
   const handleRegister = () => {
@@ -42,8 +34,6 @@ function DataFetching() {
           "email": email,
           "password": password,
         }).then((res) => {
-          // setAccessToken(res.headers['access-token']);
-          // console.log(accessToken);
           localStorage.setItem('access-token', res.headers['access-token']);
           localStorage.setItem('client', res.headers['client']);
           localStorage.setItem('expiry', res.headers['expiry']);
@@ -64,26 +54,51 @@ function DataFetching() {
   //Send Message 
   const handleMessage = () => {
     const headers = {
-        'access-token': localStorage.getItem('access-token'),
-        'client': localStorage.getItem('client'),
-        'expiry': localStorage.getItem('expiry'),
-        'uid': localStorage.getItem('uid'),
+      'access-token': localStorage.getItem('access-token'),
+      'client': localStorage.getItem('client'),
+      'expiry': localStorage.getItem('expiry'),
+      'uid': localStorage.getItem('uid'),
     }
     axios
-    .post('http://206.189.91.54//api/v1/messages',
-      {
-        "receiver_id": 1,
-        "receiver_class": "User",
-        "body": "kamusta?"
-      },
-      {headers}
-      )
-      .then(res => {
-        console.log('body');
-      }).catch(err => {
-        console.log(err);
-      });
+      .post('http://206.189.91.54//api/v1/messages',
+        {
+          "receiver_id": 1,
+          "receiver_class": "User",
+          "body": sendMessage
+        },
+        {headers}
+    )
+    .then(res => {
+      console.log(res);
+      console.log(res.data);
+      
+    }).catch(err => {
+      console.log(err);
+    });
   };
+
+  //Get Message 
+  const handleRetrieveMessage = () => {
+    const headers = {
+      'access-token': localStorage.getItem('access-token'),
+      'client': localStorage.getItem('client'),
+      'expiry': localStorage.getItem('expiry'),
+      'uid': localStorage.getItem('uid'),
+    }
+    axios
+      .get('http://206.189.91.54//api/v1/messages?receiver_class=User&receiver_id=1',
+      {headers}
+    )
+      .then(res => {
+        console.log(res.data.data);
+        console.log(res.data.data.map((i) => [i][0]['body']));
+    })
+      .catch(err => {
+        console.log(err);
+      })
+  }
+
+  // handleRetrieveMessage();
 
   //Get Email value
   const handleEmail = (e) => {
@@ -111,7 +126,7 @@ function DataFetching() {
       <button onClick={handleLogin}>Login</button><br/><br/>
       
       <textarea placeholder='message' onChange={handleGetMessage} rows='4' cols='50' />
-      <button onClick={handleMessage}>Send</button>
+      <button onClick={handleMessage}>Send</button><br/>
     </div>
   )
 };
